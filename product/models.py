@@ -1,6 +1,7 @@
-import mptt
+from django.core.exceptions import ValidationError
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
+from .fields import OrderField
 
 
 class ActiveQuerySet(models.QuerySet):
@@ -44,8 +45,13 @@ class ProductLine(models.Model):
     is_active = models.BooleanField(default=True)
 
     product  = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_line')
-
+    order = OrderField(unique_for_field='product', blank=True)
     objects = ActiveQuerySet.as_manager()
 
-    def __str__(self):
-        return self.product.name
+    def clean_fields(self, exclude):
+        super().clean_fields(exclude)
+
+        filter_pl = ProductLine.objects.filter(product=self.product)
+        for pl in filter_pl:
+            if pl.order == self.order and pl.id != self.id:
+                raise ValidationError('Order must be unique')
