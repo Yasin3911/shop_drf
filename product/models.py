@@ -55,3 +55,6 @@ class ProductLine(models.Model):
         for pl in filter_pl:
             if pl.order == self.order and pl.id != self.id:
                 raise ValidationError('Order must be unique')
+
+    def __str__(self):
+        return self.sku

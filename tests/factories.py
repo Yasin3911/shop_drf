@@ -1,7 +1,7 @@
 import factory
 from unicodedata import category
 
-from product.models import Product, Brand, Category
+from product.models import Product, Brand, Category, ProductLine
 
 class CategoryFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -25,3 +25,14 @@ class ProductFactory(factory.django.DjangoModelFactory):
     description = factory.sequence(lambda n: f"product_description_test_{n}")
     brand = factory.SubFactory(BrandFactory)
     category = factory.SubFactory(CategoryFactory)
+
+
+class ProductLineFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ProductLine
+
+    stock_qty = 10
+    is_active = True
+    sku = factory.sequence(lambda n: f"sku_{n}")
+    price = 100
+    product = factory.SubFactory(ProductFactory)

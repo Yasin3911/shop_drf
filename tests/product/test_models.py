@@ -1,4 +1,5 @@
 import pytest
+from django.core.exceptions import ValidationError
 
 pytestmark = pytest.mark.django_db
 
@@ -17,3 +18,13 @@ class TestProductModel:
         new_object = product_factory(name = "product_test")
         assert new_object.__str__() == "product_test"
 
+class TestProductLineModel:
+    def test_str_method(self, product_line_factory):
+        new_object = product_line_factory(sku = "sku_test")
+        assert new_object.__str__() == "sku_test"
+
+    def test_duplicate_order(self, product_line_factory, product_factory):
+        prd = product_factory()
+        product_line_factory(order=1, product=prd)
+        with pytest.raises(ValidationError):
+            product_line_factory(order=1, product=prd).clean_fields(None)

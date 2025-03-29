@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
@@ -42,7 +42,11 @@ class ProductViewSet(viewsets.ViewSet):
 
     def retrieve(self, request, pk=None):
         # serializer_data = ProductSerializer(self.queryset.get(pk=pk))
+        if pk.isdigit() == False:
+            return Response({'detail': 'Product ID is not valid'}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer_data = ProductSerializer(get_object_or_404(self.get_queryset(), pk=pk))
+
         return Response(serializer_data.data)
 
     @action(methods=['get'], detail=False, url_path="brand/(?P<brand>.+)")
